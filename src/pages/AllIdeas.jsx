@@ -24,7 +24,7 @@ export default function AllIdeas() {
         >
           Все ({ideas.length})
         </button>
-        {categories.map((c) => (
+        {categories.filter((c) => c.id !== "movies").map((c) => (
           <button
             key={c.id}
             onClick={() => setActiveCat(c.id)}

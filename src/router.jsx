@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
 import Home from "./pages/Home";
 import AllIdeas from "./pages/AllIdeas";
+import AllIdeasList from "./pages/AllIdeasList";
 import CategoryPage from "./pages/CategoryPage";
 import Quests from "./pages/Quests";
 import Progress from "./pages/Progress";
@@ -18,7 +19,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: "ideas", element: <AllIdeas /> },
-      { path: "ideas/all", element: <AllIdeas /> },
+      { path: "ideas/all", element: <AllIdeasList /> },
       { path: "category/adult", element: <AdultPage /> },
       { path: "category/:id", element: <CategoryPage /> },
       { path: "quests", element: <Quests /> },

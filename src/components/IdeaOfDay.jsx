@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
+import { Check } from "lucide-react";
 import { getIdeaOfDay, getTodayLabel } from "../utils/ideaOfDay";
 import { getCategory } from "../data/categories";
-import { Sparkles, ArrowRight } from "lucide-react";
 import { useAppStore } from "../store/useAppStore";
+import CategoryBadge from "./CategoryBadge";
 
 export default function IdeaOfDay() {
   const idea = getIdeaOfDay();
@@ -12,51 +13,39 @@ export default function IdeaOfDay() {
   const isDone = history.some((h) => h.ideaId === idea.id);
 
   return (
-    <div className="relative rounded-3xl overflow-hidden border border-amber/30 bg-gradient-to-br from-amber/10 via-card to-card p-6 md:p-8">
-      <div
-        className="absolute -top-20 -right-20 w-48 h-48 rounded-full blur-3xl opacity-30"
-        style={{ background: cat?.color }}
-      />
+    <section className="flex flex-col gap-4 rounded-tile border border-line bg-paper p-5 md:flex-row md:items-center md:gap-6 md:p-6">
+      <CategoryBadge category={cat} />
 
-      <div className="relative">
-        <div className="flex items-center gap-2 mb-4">
-          <Sparkles size={16} className="text-amber" />
-          <div className="text-xs uppercase tracking-wider text-amber font-semibold">
-            Идея дня · {getTodayLabel()}
-          </div>
+      <div className="min-w-0 flex-1">
+        <div className="mb-1 text-sm font-medium text-ink-soft">
+          Идея дня, {getTodayLabel()}
         </div>
-
-        <h2 className="font-display text-2xl md:text-3xl mb-2">{idea.title}</h2>
-        <p className="text-gray-300 mb-4 leading-relaxed">{idea.description}</p>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            to={
-              idea.category === "adult"
-                ? "/category/adult"
-                : `/category/${idea.category}`
-            }
-            className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-white transition"
-          >
-            {cat?.emoji} {cat?.name}
-          </Link>
-
-          <div className="flex-1" />
-
-          {isDone ? (
-            <div className="text-xs text-amber font-semibold">
-              ✅ Уже сделали сегодня
-            </div>
-          ) : (
-            <button
-              onClick={() => completeIdea(idea.id)}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-amber text-bg font-semibold text-sm hover:bg-amber/90 transition"
-            >
-              Мы сделали <ArrowRight size={16} />
-            </button>
-          )}
-        </div>
+        <h2 className="font-display text-2xl leading-tight">{idea.title}</h2>
+        <p className="mt-1.5 text-ink-soft">{idea.description}</p>
+        <Link
+          to={`/category/${idea.category}`}
+          className="mt-3 inline-block text-sm font-medium underline decoration-ink/30 underline-offset-4 transition-colors hover:decoration-ink"
+        >
+          Раздел «{cat?.name}»
+        </Link>
       </div>
-    </div>
+
+      <div className="shrink-0">
+        {isDone ? (
+          <div className="inline-flex items-center gap-2 text-sm font-semibold">
+            <Check size={16} className="text-cobalt" />
+            Уже сделали сегодня
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => completeIdea(idea.id)}
+            className="w-full rounded-2xl bg-ink px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-black md:w-auto"
+          >
+            Мы сделали
+          </button>
+        )}
+      </div>
+    </section>
   );
 }

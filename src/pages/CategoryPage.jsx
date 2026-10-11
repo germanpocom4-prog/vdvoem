@@ -1,10 +1,14 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { getCategory } from "../data/categories";
 import { getIdeasByCategory } from "../data/ideas";
 import IdeaCard from "../components/IdeaCard";
 import EmptyState from "../components/EmptyState";
-import { ArrowLeft, Lock } from "lucide-react";
+import PageTitle from "../components/PageTitle";
+import BackLink from "../components/BackLink";
+import CategoryBadge from "../components/CategoryBadge";
+import { Lock, Unlock } from "lucide-react";
 import { useAppStore } from "../store/useAppStore";
+import { plural } from "../utils/format";
 
 // сколько нужно выполнить идей, чтобы открыть уровень
 const LEVEL_REQUIREMENTS = {
@@ -25,23 +29,20 @@ export default function CategoryPage() {
 
   const isAdult = id === "adult";
 
-  // Если это НЕ 18+, показываем как раньше
+  // Если это НЕ 18+, показываем обычную сетку карт
   if (!isAdult) {
     return (
-      <div className="py-8 space-y-6">
-        <Link to="/ideas" className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm">
-          <ArrowLeft size={16} /> Все идеи
-        </Link>
-        <div className="space-y-2">
-          <h1 className="font-display text-3xl md:text-4xl">
-            {cat.emoji} {cat.name}
-          </h1>
-          <p className="text-gray-400">{cat.description}</p>
-        </div>
+      <div className="space-y-8 py-8 md:py-12">
+        <BackLink to="/ideas">Все идеи</BackLink>
+        <PageTitle
+          badge={<CategoryBadge category={cat} />}
+          title={cat.name}
+          subtitle={cat.description}
+        />
         {ideas.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid items-start gap-4 md:grid-cols-2">
             {ideas.map((idea) => (
               <IdeaCard key={idea.id} idea={idea} />
             ))}
@@ -60,19 +61,14 @@ export default function CategoryPage() {
   });
 
   return (
-    <div className="py-8 space-y-8">
-      <Link to="/ideas" className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm">
-        <ArrowLeft size={16} /> Все идеи
-      </Link>
-
-      <div className="space-y-2">
-        <h1 className="font-display text-3xl md:text-4xl">
-          {cat.emoji} {cat.name}
-        </h1>
-        <p className="text-gray-400">{cat.description}</p>
-        <div className="text-xs text-amber">
-          Выполнено идей всего: {totalCompleted}
-        </div>
+    <div className="space-y-10 py-8 md:py-12">
+      <div className="space-y-8">
+        <BackLink to="/ideas">Все идеи</BackLink>
+        <PageTitle
+          badge={<CategoryBadge category={cat} />}
+          title={cat.name}
+          subtitle={`${cat.description}. Выполнено идей всего: ${totalCompleted}`}
+        />
       </div>
 
       {[1, 2, 3, 4].map((lvl) => {
@@ -84,47 +80,49 @@ export default function CategoryPage() {
         if (levelIdeas.length === 0) return null;
 
         return (
-          <div key={lvl} className="space-y-4">
+          <section key={lvl} className="space-y-4">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="font-display text-xl md:text-2xl flex items-center gap-2">
-                {isLocked && <Lock size={20} className="text-gray-500" />}
+              <h2 className="flex items-center gap-2 font-display text-2xl">
+                {isLocked && <Lock size={20} className="text-ink-soft" />}
                 Уровень {lvl}
               </h2>
               {!isLocked ? (
-                <span className="text-xs text-amber font-semibold">
-                  🔓 Открыт
+                <span className="inline-flex items-center gap-1.5 text-sm font-semibold">
+                  <Unlock size={16} className="text-cobalt" />
+                  Открыт
                 </span>
               ) : (
-                <span className="text-xs text-gray-500">
-                  {progress} / {required} идей
+                <span className="text-sm text-ink-soft">
+                  {progress} из {required} {plural(required, "идеи", "идей", "идей")}
                 </span>
               )}
             </div>
 
             {isLocked ? (
-              <div className="rounded-2xl bg-card border border-border p-8 text-center">
-                <Lock className="mx-auto mb-3 text-gray-600" size={32} />
-                <p className="text-gray-400 text-sm mb-1">
-                  Уровень откроется, когда вы выполните {required} идей
+              <div className="rounded-tile border border-dashed border-line p-8 text-center">
+                <Lock className="mx-auto mb-3 text-ink-soft" size={28} />
+                <p className="mb-1 text-sm">
+                  Уровень откроется, когда вы выполните {required}{" "}
+                  {plural(required, "идею", "идеи", "идей")}
                 </p>
-                <p className="text-xs text-gray-600">
+                <p className="text-sm text-ink-soft">
                   Осталось: {required - totalCompleted}
                 </p>
-                <div className="mt-4 max-w-xs mx-auto h-2 rounded-full bg-bg overflow-hidden">
+                <div className="mx-auto mt-4 h-2 max-w-xs overflow-hidden rounded-full bg-line">
                   <div
-                    className="h-full bg-amber transition-all"
+                    className="h-full bg-ink transition-all"
                     style={{ width: `${(progress / required) * 100}%` }}
                   />
                 </div>
               </div>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid items-start gap-4 md:grid-cols-2">
                 {levelIdeas.map((idea) => (
                   <IdeaCard key={idea.id} idea={idea} />
                 ))}
               </div>
             )}
-          </div>
+          </section>
         );
       })}
     </div>

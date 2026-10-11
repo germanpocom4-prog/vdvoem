@@ -1,20 +1,17 @@
 import { motion } from "framer-motion";
-import { Sparkles } from "lucide-react";
+import { Shuffle } from "lucide-react";
 
-export default function RouletteButton({ onClick, loading }) {
+export default function RouletteButton({ onClick, loading, hasIdea }) {
   return (
     <motion.button
-      whileTap={{ scale: 0.95 }}
-      whileHover={{ scale: 1.02 }}
+      type="button"
+      whileTap={{ scale: 0.97 }}
       onClick={onClick}
       disabled={loading}
-      className="relative w-full max-w-md mx-auto py-8 rounded-3xl font-display text-xl md:text-2xl tracking-tight bg-gradient-to-br from-amber via-amber to-wine text-bg overflow-hidden group"
+      className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-cherry px-6 py-4 text-lg font-semibold text-white shadow-lift transition-colors hover:bg-[#c42740] disabled:opacity-80"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-      <span className="relative flex items-center justify-center gap-3">
-        <Sparkles size={24} />
-        {loading ? "Ищу..." : "Крутануть"}
-      </span>
+      <Shuffle size={20} />
+      {loading ? "Тасуем…" : hasIdea ? "Вытянуть другую" : "Вытянуть карту"}
     </motion.button>
   );
 }

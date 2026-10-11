@@ -1,57 +1,52 @@
 import { Link } from "react-router-dom";
+import { Layers } from "lucide-react";
 import { ideas } from "../data/ideas";
 import { categories } from "../data/categories";
+import { plural } from "../utils/format";
+import PageTitle from "../components/PageTitle";
+import CategoryBadge from "../components/CategoryBadge";
+
+const tile =
+  "flex items-start gap-4 rounded-tile border border-line bg-paper p-5 transition-colors hover:border-ink/40";
 
 export default function AllIdeas() {
   const countByCat = (id) => ideas.filter((i) => i.category === id).length;
+  const ideaWord = (n) => plural(n, "идея", "идеи", "идей");
 
   return (
-    <div className="py-8 space-y-6">
-      <div>
-        <h1 className="font-display text-3xl md:text-4xl">Все идеи</h1>
-        <p className="text-gray-400 mt-2 text-sm">
-          Выбери категорию — откроется отдельная страница
-        </p>
-      </div>
+    <div className="space-y-8 py-8 md:py-12">
+      <PageTitle
+        title="Все идеи"
+        subtitle="Выбери категорию — откроется отдельная страница"
+      />
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <Link
-          to="/ideas/all"
-          className="rounded-3xl bg-card border border-border p-6 hover:border-amber/50 transition group"
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="text-4xl">📚</div>
-            <div className="text-xs text-amber font-semibold">
-              {ideas.length} идей →
+      <div className="grid gap-3 md:grid-cols-2">
+        <Link to="/ideas/all" className={tile}>
+          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-ink text-white">
+            <Layers size={26} />
+          </div>
+          <div>
+            <div className="font-display text-xl">Все идеи</div>
+            <p className="text-sm text-ink-soft">
+              Полный список — от весёлых до 18+
+            </p>
+            <div className="mt-2 text-sm font-semibold">
+              {ideas.length} {ideaWord(ideas.length)}
             </div>
           </div>
-          <div className="font-display text-xl mb-1">Все идеи</div>
-          <p className="text-gray-400 text-sm">
-            Полный список — от весёлых до 18+
-          </p>
         </Link>
 
         {categories.map((c) => {
           const count = countByCat(c.id);
           return (
-            <Link
-              key={c.id}
-              to={`/category/${c.id}`}
-              className="rounded-3xl bg-card border border-border p-6 hover:border-amber/50 transition group relative overflow-hidden"
-            >
-              <div
-                className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition"
-                style={{ background: c.color }}
-              />
-              <div className="relative">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-4xl">{c.emoji}</div>
-                  <div className="text-xs text-amber font-semibold">
-                    {count} {count === 1 ? "идея" : count < 5 ? "идеи" : "идей"} →
-                  </div>
+            <Link key={c.id} to={`/category/${c.id}`} className={tile}>
+              <CategoryBadge category={c} />
+              <div>
+                <div className="font-display text-xl">{c.name}</div>
+                <p className="text-sm text-ink-soft">{c.description}</p>
+                <div className="mt-2 text-sm font-semibold">
+                  {count} {ideaWord(count)}
                 </div>
-                <div className="font-display text-xl mb-1">{c.name}</div>
-                <p className="text-gray-400 text-sm">{c.description}</p>
               </div>
             </Link>
           );

@@ -1,84 +1,83 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Flame } from "lucide-react";
 import RouletteButton from "../components/RouletteButton";
-import IdeaCard from "../components/IdeaCard";
+import Deck from "../components/Deck";
 import FilterBar from "../components/FilterBar";
 import IdeaOfDay from "../components/IdeaOfDay";
 import { pickRandom } from "../utils/random";
+import { plural } from "../utils/format";
 import { useFiltersStore } from "../store/useFiltersStore";
 import { useAppStore } from "../store/useAppStore";
 
 export default function Home() {
   const [idea, setIdea] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [nothingFound, setNothingFound] = useState(false);
   const filters = useFiltersStore();
   const streak = useAppStore((s) => s.streak);
 
   const spin = () => {
+    if (loading) return;
     setLoading(true);
+    setNothingFound(false);
     setTimeout(() => {
       const next = pickRandom(filters, idea?.id);
-      setIdea(next);
+      if (next) {
+        setIdea(next);
+      } else {
+        setNothingFound(true);
+      }
       setLoading(false);
-    }, 400);
-  };
-
-  const streakLabel = () => {
-    if (streak === 0) return "дней";
-    if (streak === 1) return "день";
-    if (streak < 5) return "дня";
-    return "дней";
+    }, 650);
   };
 
   return (
-    <div className="py-8 md:py-12 space-y-8">
-      {/* Заголовок */}
-      <div className="text-center space-y-3">
-        <h1 className="font-display text-3xl md:text-5xl tracking-tight">
-          Чем заняться <span className="text-amber">вдвоём?</span>
-        </h1>
-        <p className="text-gray-400 text-sm md:text-base">
-          Жми — и получишь одну идею. Не список. Одну.
-        </p>
-        {streak > 0 && (
-          <div className="inline-block px-4 py-1.5 rounded-full bg-amber/10 text-amber text-sm font-semibold">
-            🔥 Стрик: {streak} {streakLabel()}
+    <div className="space-y-10 py-8 md:space-y-14 md:py-14">
+      <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_24rem] md:grid-rows-[auto_1fr] md:gap-x-14 md:gap-y-8">
+        {/* Заголовок */}
+        <div className="space-y-4 md:col-start-1 md:row-start-1 md:pt-4">
+          <h1 className="font-display text-[2.5rem] leading-[1.02] md:text-[3.5rem]">
+            Чем заняться вдвоём?
+          </h1>
+          <p className="max-w-md text-base text-ink-soft md:text-lg">
+            Жми — и получишь одну идею. Не список. Одну.
+          </p>
+          {streak > 0 && (
+            <div className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-4 py-1.5 text-sm font-semibold">
+              <Flame size={16} className="text-cherry" />
+              Стрик: {streak} {plural(streak, "день", "дня", "дней")}
+            </div>
+          )}
+        </div>
+
+        {/* Колода и кнопка */}
+        <div className="mx-auto w-full max-w-sm space-y-4 md:col-start-2 md:row-span-2 md:row-start-1 md:mx-0">
+          <Deck
+            idea={idea}
+            loading={loading}
+            onDraw={spin}
+            onComplete={() => setIdea(null)}
+          />
+          <RouletteButton onClick={spin} loading={loading} hasIdea={!!idea} />
+          {nothingFound && (
+            <p role="status" className="text-center text-sm text-ink-soft">
+              Под такие настройки идей нет. Попробуй выбрать «любое».
+            </p>
+          )}
+        </div>
+
+        {/* Фильтры */}
+        <div className="md:col-start-1 md:row-start-2">
+          <div className="rounded-tile border border-line bg-paper p-5 md:p-6">
+            <div className="mb-4 font-display text-xl">
+              Хочешь конкретнее? Настрой:
+            </div>
+            <FilterBar />
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Идея дня */}
       <IdeaOfDay />
-
-      {/* Рулетка */}
-      <RouletteButton onClick={spin} loading={loading} />
-
-      {/* Результат или фильтры */}
-      <AnimatePresence mode="wait">
-        {idea ? (
-          <motion.div
-            key={idea.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <IdeaCard idea={idea} onComplete={() => setIdea(null)} />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="filters"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <div className="rounded-3xl bg-card border border-border p-6">
-              <div className="text-sm font-semibold text-gray-300 mb-4">
-                Хочешь конкретнее? Настрой:
-              </div>
-              <FilterBar />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

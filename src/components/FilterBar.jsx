@@ -1,5 +1,6 @@
 import { useFiltersStore } from "../store/useFiltersStore";
 import { timeLabel, budgetLabel, moodLabel } from "../utils/format";
+import Chip from "./Chip";
 
 const FILTERS = [
   { key: "time", options: ["any", "quick", "evening", "day"], labels: timeLabel, title: "Время" },
@@ -11,25 +12,19 @@ export default function FilterBar() {
   const filters = useFiltersStore();
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {FILTERS.map((f) => (
         <div key={f.key}>
-          <div className="text-xs uppercase text-gray-500 mb-2 tracking-wider">
-            {f.title}
-          </div>
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+          <div className="mb-2 text-sm font-semibold">{f.title}</div>
+          <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible">
             {f.options.map((opt) => (
-              <button
+              <Chip
                 key={opt}
+                active={filters[f.key] === opt}
                 onClick={() => filters.setFilter(f.key, opt)}
-                className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition ${
-                  filters[f.key] === opt
-                    ? "bg-amber text-bg font-semibold"
-                    : "bg-card border border-border text-gray-400 hover:text-white"
-                }`}
               >
                 {f.labels[opt]}
-              </button>
+              </Chip>
             ))}
           </div>
         </div>

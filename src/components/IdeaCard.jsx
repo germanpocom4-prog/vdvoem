@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { Clock, Wallet, Heart, Check } from "lucide-react";
 import { getCategory } from "../data/categories";
 import { timeLabel, budgetLabel } from "../utils/format";
@@ -7,6 +6,7 @@ import { getIdeaTimer } from "../utils/ideaTimers";
 import Timer from "./Timer";
 import ShareButton from "./ShareButton";
 
+// Идея — это карта: заливка и цвет текста берутся из категории
 export default function IdeaCard({ idea, onComplete }) {
   const cat = getCategory(idea.category);
   const favorites = useAppStore((s) => s.favorites);
@@ -18,94 +18,100 @@ export default function IdeaCard({ idea, onComplete }) {
   const isDone = history.some((h) => h.ideaId === idea.id);
   const timerMinutes = getIdeaTimer(idea);
 
+  const fill = cat?.color || "#FFFFFF";
+  const fg = cat?.fg || "#1E1633";
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="rounded-3xl bg-card border border-border p-6 md:p-8 relative overflow-hidden"
+    <article
+      className="flex flex-col rounded-card p-6 shadow-card md:p-7"
+      style={{ background: fill, color: fg }}
     >
-      <div
-        className="absolute -top-20 -right-20 w-48 h-48 rounded-full blur-3xl opacity-20"
-        style={{ background: cat?.color }}
-      />
-
-      <div className="relative">
-        <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <span
-            className="text-xs font-semibold px-3 py-1 rounded-full"
-            style={{
-              background: `${cat?.color}22`,
-              color: cat?.color,
-            }}
-          >
-            {cat?.emoji} {cat?.name}
+      <div className="mb-5 flex items-center justify-between gap-3">
+        <span className="inline-flex items-center gap-2 text-sm font-semibold">
+          <span className="text-xl leading-none" aria-hidden="true">
+            {cat?.emoji}
           </span>
-          {idea.level && (
-            <span className="text-xs font-semibold px-3 py-1 rounded-full bg-wine/20 text-wine">
-              Уровень {idea.level}
-            </span>
-          )}
-        </div>
-
-        <h2 className="font-display text-2xl md:text-3xl mb-3">
-          {idea.title}
-        </h2>
-        <p className="text-gray-400 mb-6 leading-relaxed">{idea.description}</p>
-
-        <div className="flex flex-wrap gap-3 mb-6 text-sm text-gray-400">
-          <div className="flex items-center gap-1.5">
-            <Clock size={16} />
-            {timeLabel[idea.time]}
-          </div>
-          <div className="flex items-center gap-1.5">
-            <Wallet size={16} />
-            {budgetLabel[idea.budget]}
-          </div>
-        </div>
-
-        {idea.steps && idea.steps.length > 0 && (
-          <div className="mb-6 space-y-2">
-            {idea.steps.map((s, i) => (
-              <div key={i} className="flex gap-3 text-sm text-gray-300">
-                <span className="text-amber font-semibold shrink-0">
-                  {i + 1}.
-                </span>
-                {s}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {timerMinutes && (
-          <div className="mb-6">
-            <Timer minutes={timerMinutes} />
-          </div>
-        )}
-
-        <div className="flex gap-3">
-          <button
-            onClick={() => {
-              completeIdea(idea.id);
-              onComplete?.();
-            }}
-            className="flex-1 py-3 rounded-2xl bg-amber text-bg font-semibold flex items-center justify-center gap-2 hover:bg-amber/90 transition"
+          {cat?.name}
+        </span>
+        {idea.level && (
+          <span
+            className="rounded-full px-3 py-1 text-xs font-semibold"
+            style={{ background: fg, color: fill }}
           >
-            <Check size={18} />
-            {isDone ? "Сделано ещё раз" : "Мы сделали"}
-          </button>
-          <button
-            onClick={() => toggleFavorite(idea.id)}
-            className={`px-4 rounded-2xl border transition ${
-              isFav
-                ? "bg-wine/20 border-wine text-wine"
-                : "border-border text-gray-400 hover:text-white"
-            }`}
-          >
-            <Heart size={18} fill={isFav ? "currentColor" : "none"} />
-          </button>
-          <ShareButton idea={idea} />
-        </div>
+            Уровень {idea.level}
+          </span>
+        )}
       </div>
-    </motion.div>
+
+      <h2 className="mb-3 font-display text-[1.75rem] leading-[1.1] md:text-3xl">
+        {idea.title}
+      </h2>
+      <p className="mb-5 leading-relaxed" style={{ opacity: 0.92 }}>
+        {idea.description}
+      </p>
+
+      <div className="mb-5 flex flex-wrap gap-2 text-sm font-medium">
+        <span
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1"
+          style={{ border: "1px solid currentColor" }}
+        >
+          <Clock size={14} />
+          {timeLabel[idea.time]}
+        </span>
+        <span
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1"
+          style={{ border: "1px solid currentColor" }}
+        >
+          <Wallet size={14} />
+          {budgetLabel[idea.budget]}
+        </span>
+      </div>
+
+      {idea.steps && idea.steps.length > 0 && (
+        <ol className="mb-5 space-y-3 rounded-2xl bg-paper p-4 text-ink">
+          {idea.steps.map((s, i) => (
+            <li key={i} className="flex gap-3 text-sm">
+              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white">
+                {i + 1}
+              </span>
+              <span className="pt-0.5">{s}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+
+      {timerMinutes && (
+        <div className="mb-5">
+          <Timer minutes={timerMinutes} />
+        </div>
+      )}
+
+      <div className="flex gap-3">
+        <button
+          type="button"
+          onClick={() => {
+            completeIdea(idea.id);
+            onComplete?.();
+          }}
+          className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-ink py-3.5 font-semibold text-white transition-colors hover:bg-black"
+        >
+          <Check size={18} />
+          {isDone ? "Сделано ещё раз" : "Мы сделали"}
+        </button>
+        <button
+          type="button"
+          onClick={() => toggleFavorite(idea.id)}
+          aria-pressed={isFav}
+          aria-label={isFav ? "Убрать из избранного" : "В избранное"}
+          className={`grid w-12 shrink-0 place-items-center rounded-2xl transition-colors ${
+            isFav ? "bg-paper text-cherry" : "hover:bg-white/20"
+          }`}
+          style={isFav ? undefined : { border: "1.5px solid currentColor" }}
+        >
+          <Heart size={18} fill={isFav ? "currentColor" : "none"} />
+        </button>
+        <ShareButton idea={idea} />
+      </div>
+    </article>
   );
 }

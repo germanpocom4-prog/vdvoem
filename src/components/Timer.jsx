@@ -40,15 +40,13 @@ export default function Timer({ minutes = 30 }) {
   const isAlmostDone = secondsLeft <= 60 && secondsLeft > 0;
 
   return (
-    <div className="rounded-2xl bg-bg border border-border p-4">
+    <div className="rounded-2xl bg-paper p-4 text-ink">
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1">
-          <div className="text-xs text-gray-500 mb-1 uppercase tracking-wider">
-            Таймер
-          </div>
+          <div className="mb-1 text-sm font-medium text-ink-soft">Таймер</div>
           <div
-            className={`font-display text-3xl tabular-nums transition ${
-              isAlmostDone ? "text-wine animate-pulse" : "text-amber"
+            className={`font-display text-4xl leading-none tabular-nums ${
+              isAlmostDone ? "animate-pulse text-cherry" : "text-ink"
             }`}
           >
             {mm}:{ss}
@@ -57,38 +55,44 @@ export default function Timer({ minutes = 30 }) {
 
         <div className="flex gap-2">
           <button
+            type="button"
             onClick={toggle}
             disabled={isDone}
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition ${
+            aria-label={running ? "Пауза" : "Старт"}
+            className={`grid h-12 w-12 place-items-center rounded-full transition-colors ${
               isDone
-                ? "bg-card border border-border text-gray-500 cursor-not-allowed"
+                ? "cursor-not-allowed bg-line text-ink-soft"
                 : running
-                ? "bg-wine/20 border border-wine text-wine hover:bg-wine/30"
-                : "bg-amber text-bg hover:bg-amber/90"
+                ? "bg-cherry text-white hover:bg-[#c42740]"
+                : "bg-ink text-white hover:bg-black"
             }`}
           >
             {running ? <Pause size={20} /> : <Play size={20} />}
           </button>
           <button
+            type="button"
             onClick={reset}
-            className="w-12 h-12 rounded-full bg-card border border-border text-gray-400 flex items-center justify-center hover:text-white transition"
+            aria-label="Сбросить таймер"
+            className="grid h-12 w-12 place-items-center rounded-full border border-line text-ink-soft transition-colors hover:text-ink"
           >
             <RotateCcw size={18} />
           </button>
         </div>
       </div>
 
-      {/* Прогресс-бар */}
-      <div className="mt-3 h-1 rounded-full bg-border overflow-hidden">
+      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line">
         <div
-          className="h-full bg-amber transition-all duration-1000"
+          className="h-full bg-ink transition-all duration-1000"
           style={{ width: `${progress}%` }}
         />
       </div>
 
       {isDone && (
-        <div className="mt-3 text-sm text-amber font-semibold text-center">
-          ⏰ Время вышло!
+        <div
+          role="status"
+          className="mt-3 text-center text-sm font-semibold text-cherry"
+        >
+          Время вышло!
         </div>
       )}
     </div>

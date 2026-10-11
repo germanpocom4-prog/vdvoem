@@ -4,6 +4,20 @@ import { quests } from "../data/quests";
 import { ideas } from "../data/ideas";
 import { Check } from "lucide-react";
 import { useAppStore } from "../store/useAppStore";
+import { plural } from "../utils/format";
+import PageTitle from "../components/PageTitle";
+import BackLink from "../components/BackLink";
+
+function EmojiBadge({ emoji }) {
+  return (
+    <div
+      className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-sun text-3xl"
+      aria-hidden="true"
+    >
+      {emoji}
+    </div>
+  );
+}
 
 export default function Quests() {
   const [active, setActive] = useState(null);
@@ -15,74 +29,71 @@ export default function Quests() {
     const allDone = quest.steps.every((_, i) => doneSteps[i]);
 
     return (
-      <div className="py-8 space-y-6">
-        <button
+      <div className="space-y-8 py-8 md:py-12">
+        <BackLink
           onClick={() => {
             setActive(null);
             setDoneSteps({});
           }}
-          className="text-gray-400 hover:text-white text-sm"
         >
-          ← Назад
-        </button>
+          Назад
+        </BackLink>
 
-        <h1 className="font-display text-3xl">
-          {quest.emoji} {quest.title}
-        </h1>
-        <p className="text-gray-400">{quest.description}</p>
+        <PageTitle
+          badge={<EmojiBadge emoji={quest.emoji} />}
+          title={quest.title}
+          subtitle={quest.description}
+        />
 
-        <div className="space-y-4">
+        <ol className="space-y-3">
           {quest.steps.map((step, i) => {
             const idea = ideas.find((x) => x.id === step.ideaId);
             const done = doneSteps[i];
             return (
-              <motion.div
+              <li
                 key={i}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className={`rounded-2xl border p-5 transition ${
-                  done ? "bg-amber/5 border-amber/30" : "bg-card border-border"
+                className={`flex items-start gap-4 rounded-tile border bg-paper p-5 transition-colors ${
+                  done ? "border-ink" : "border-line"
                 }`}
               >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="text-xs text-gray-500 mb-1">Шаг {i + 1}</div>
-                    <div className="font-semibold mb-1">{step.label}</div>
-                    {idea && (
-                      <p className="text-sm text-gray-400">{idea.description}</p>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => {
-                      setDoneSteps((prev) => ({ ...prev, [i]: !prev[i] }));
-                      if (!done && idea) completeIdea(idea.id);
-                    }}
-                    className={`shrink-0 w-10 h-10 rounded-full border flex items-center justify-center transition ${
-                      done
-                        ? "bg-amber border-amber text-bg"
-                        : "border-border text-gray-500"
-                    }`}
-                  >
-                    <Check size={18} />
-                  </button>
+                <button
+                  type="button"
+                  aria-pressed={!!done}
+                  aria-label={`Шаг ${i + 1}: ${step.label}`}
+                  onClick={() => {
+                    setDoneSteps((prev) => ({ ...prev, [i]: !prev[i] }));
+                    if (!done && idea) completeIdea(idea.id);
+                  }}
+                  className={`grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 font-display text-lg transition-colors ${
+                    done
+                      ? "border-ink bg-ink text-white"
+                      : "border-line text-ink-soft hover:border-ink hover:text-ink"
+                  }`}
+                >
+                  {done ? <Check size={20} /> : i + 1}
+                </button>
+                <div className="min-w-0 flex-1 pt-1">
+                  <div className="mb-1 font-semibold">{step.label}</div>
+                  {idea && (
+                    <p className="text-sm text-ink-soft">{idea.description}</p>
+                  )}
                 </div>
-              </motion.div>
+              </li>
             );
           })}
-        </div>
+        </ol>
 
         {allDone && (
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            className="text-center p-6 rounded-3xl bg-gradient-to-br from-amber/20 to-wine/20 border border-amber/30"
+            className="rounded-card bg-sun p-6 text-center shadow-card"
           >
-            <div className="text-5xl mb-2">🎉</div>
-            <div className="font-display text-xl">Квест пройден!</div>
-            <p className="text-gray-300 text-sm mt-1">
-              Вы молодцы. Отдохните и обнимитесь.
-            </p>
+            <div className="mb-2 text-4xl" aria-hidden="true">
+              🎉
+            </div>
+            <div className="font-display text-2xl">Квест пройден!</div>
+            <p className="mt-1">Вы молодцы. Отдохните и обнимитесь.</p>
           </motion.div>
         )}
       </div>
@@ -90,24 +101,27 @@ export default function Quests() {
   }
 
   return (
-    <div className="py-8 space-y-6">
-      <h1 className="font-display text-3xl md:text-4xl">Квесты на вечер</h1>
-      <p className="text-gray-400">
-        Готовые сценарии из 3 шагов. Просто идите по порядку.
-      </p>
+    <div className="space-y-8 py-8 md:py-12">
+      <PageTitle
+        title="Квесты на вечер"
+        subtitle="Готовые сценарии из 3 шагов. Просто идите по порядку."
+      />
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2">
         {quests.map((q) => (
           <button
             key={q.id}
+            type="button"
             onClick={() => setActive(q.id)}
-            className="text-left rounded-3xl bg-card border border-border p-6 hover:border-amber/50 transition"
+            className="flex items-start gap-4 rounded-tile border border-line bg-paper p-5 text-left transition-colors hover:border-ink/40"
           >
-            <div className="text-4xl mb-3">{q.emoji}</div>
-            <div className="font-display text-xl mb-1">{q.title}</div>
-            <p className="text-gray-400 text-sm">{q.description}</p>
-            <div className="mt-4 text-xs text-amber">
-              {q.steps.length} шага →
+            <EmojiBadge emoji={q.emoji} />
+            <div>
+              <div className="font-display text-xl">{q.title}</div>
+              <p className="text-sm text-ink-soft">{q.description}</p>
+              <div className="mt-2 text-sm font-semibold">
+                {q.steps.length} {plural(q.steps.length, "шаг", "шага", "шагов")}
+              </div>
             </div>
           </button>
         ))}

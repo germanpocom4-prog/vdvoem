@@ -1,6 +1,10 @@
 import { useState } from "react";
 import html2canvas from "html2canvas";
 import { Share2, Loader2 } from "lucide-react";
+import { getCategory } from "../data/categories";
+
+const HEART_PATH =
+  "M12 21s-7.5-4.6-9.6-9.2C.9 8.3 3 4.5 6.6 4.5c2 0 3.8 1.1 5.4 3 1.6-1.9 3.4-3 5.4-3 3.6 0 5.7 3.8 4.2 7.3C19.5 16.4 12 21 12 21z";
 
 export default function ShareButton({ idea }) {
   const [loading, setLoading] = useState(false);
@@ -8,53 +12,51 @@ export default function ShareButton({ idea }) {
   const handleShare = async () => {
     setLoading(true);
 
-    // Создаём временный div с красивой карточкой 1080x1080
+    const cat = getCategory(idea.category);
+    const fill = cat?.color || "#FFFFFF";
+    const fg = cat?.fg || "#1E1633";
+
+    // Временная карточка 1080x1080 в стиле «карты» из колоды
     const container = document.createElement("div");
     container.style.position = "fixed";
     container.style.left = "-9999px";
     container.style.top = "0";
     container.style.width = "1080px";
     container.style.height = "1080px";
-    container.style.background =
-      "linear-gradient(135deg, #0a0a0f 0%, #16161f 50%, #1a1015 100%)";
+    container.style.background = fill;
+    container.style.color = fg;
     container.style.padding = "80px";
     container.style.boxSizing = "border-box";
     container.style.display = "flex";
     container.style.flexDirection = "column";
     container.style.justifyContent = "space-between";
-    container.style.fontFamily = "Inter, system-ui, sans-serif";
-    container.style.color = "#fff";
-    container.style.position = "fixed";
+    container.style.fontFamily = '"Golos Text", system-ui, sans-serif';
 
     container.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:42px;font-weight:700;letter-spacing:-1px;">
-          Вдвоём<span style="color:#f59e0b;">.</span>
+        <div style="display:flex;align-items:center;gap:20px;">
+          <div style="width:64px;height:64px;border-radius:16px;background:#3340E0;display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" width="34" height="34" fill="#fff"><path d="${HEART_PATH}"/></svg>
+          </div>
+          <div style="font-family:'Yeseva One',Georgia,serif;font-size:48px;">Вдвоём</div>
         </div>
-        <div style="font-size:22px;color:#f59e0b;letter-spacing:2px;text-transform:uppercase;font-weight:600;">
-          Идея для пары
+        <div style="font-size:30px;font-weight:600;">
+          ${cat?.emoji || ""} ${cat?.name || "Идея для пары"}
         </div>
       </div>
 
       <div>
-        <div style="font-size:28px;color:#f59e0b;margin-bottom:32px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">
-          ${getEmoji(idea.category)} ${getCategoryName(idea.category)}
-        </div>
-        <div style="font-size:86px;font-weight:800;line-height:1.05;letter-spacing:-2px;margin-bottom:40px;">
+        <div style="font-family:'Yeseva One',Georgia,serif;font-size:100px;line-height:1.05;margin-bottom:44px;">
           ${idea.title}
         </div>
-        <div style="font-size:38px;color:#c0c0d0;line-height:1.4;max-width:900px;">
+        <div style="font-size:40px;line-height:1.4;max-width:900px;opacity:.92;">
           ${idea.description}
         </div>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #26263a;padding-top:40px;">
-        <div style="font-size:26px;color:#707080;">
-          vdvoem-black.vercel.app
-        </div>
-        <div style="font-size:26px;color:#707080;">
-          ${new Date().toLocaleDateString("ru-RU")}
-        </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;border-top:2px solid ${fg};padding-top:40px;font-size:28px;font-weight:500;">
+        <div>vdvoem-black.vercel.app</div>
+        <div>${new Date().toLocaleDateString("ru-RU")}</div>
       </div>
     `;
 
@@ -98,7 +100,7 @@ export default function ShareButton({ idea }) {
       }
     } catch (err) {
       console.error("Ошибка генерации картинки:", err);
-      document.body.removeChild(container);
+      if (container.parentNode) document.body.removeChild(container);
     } finally {
       setLoading(false);
     }
@@ -106,10 +108,13 @@ export default function ShareButton({ idea }) {
 
   return (
     <button
+      type="button"
       onClick={handleShare}
       disabled={loading}
-      className="px-4 rounded-2xl border border-border text-gray-400 hover:text-amber hover:border-amber/50 transition flex items-center justify-center gap-2"
+      aria-label="Поделиться картинкой"
       title="Поделиться картинкой"
+      className="grid w-12 shrink-0 place-items-center rounded-2xl transition-colors hover:bg-white/20"
+      style={{ border: "1.5px solid currentColor" }}
     >
       {loading ? (
         <Loader2 size={18} className="animate-spin" />
@@ -118,31 +123,4 @@ export default function ShareButton({ idea }) {
       )}
     </button>
   );
-}
-
-// Хелперы
-function getCategoryName(id) {
-  const map = {
-    funny: "Весёлые",
-    romantic: "Романтика",
-    adult: "18+",
-    drinks: "Выпивка",
-    hardcore: "Сложные",
-    distance: "На расстоянии",
-    makeup: "Помириться",
-  };
-  return map[id] || "Идея";
-}
-
-function getEmoji(id) {
-  const map = {
-    funny: "🎉",
-    romantic: "💕",
-    adult: "🔥",
-    drinks: "🍸",
-    hardcore: "🏆",
-    distance: "🌍",
-    makeup: "🕊️",
-  };
-  return map[id] || "✨";
 }

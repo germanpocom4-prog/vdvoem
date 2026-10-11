@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { ideas } from "../data/ideas";
 import { useAppStore } from "../store/useAppStore";
 import { getUnlockedLevel, getLevelProgress } from "../utils/levels";
 import IdeaCard from "../components/IdeaCard";
-import { ArrowLeft, Lock, Check } from "lucide-react";
+import PageTitle from "../components/PageTitle";
+import BackLink from "../components/BackLink";
+import { Lock, Check } from "lucide-react";
 
 const LEVELS = [
   { id: 1, name: "Разогрев", emoji: "🌸", description: "Нежные вопросы и близость" },
@@ -24,17 +25,13 @@ export default function AdultPage() {
       (i) => i.category === "adult" && i.level === selectedLevel
     );
     return (
-      <div className="py-8 space-y-6">
-        <button
-          onClick={() => setSelectedLevel(null)}
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm"
-        >
-          <ArrowLeft size={16} /> К уровням
-        </button>
-        <h1 className="font-display text-3xl">
-          {currentLevel.emoji} Уровень {currentLevel.id} — {currentLevel.name}
-        </h1>
-        <div className="grid gap-4 md:grid-cols-2">
+      <div className="space-y-8 py-8 md:py-12">
+        <BackLink onClick={() => setSelectedLevel(null)}>К уровням</BackLink>
+        <PageTitle
+          title={`Уровень ${currentLevel.id}: ${currentLevel.name}`}
+          subtitle={currentLevel.description}
+        />
+        <div className="grid items-start gap-4 md:grid-cols-2">
           {levelIdeas.map((idea) => (
             <IdeaCard key={idea.id} idea={idea} />
           ))}
@@ -44,21 +41,13 @@ export default function AdultPage() {
   }
 
   return (
-    <div className="py-8 space-y-6">
-      <Link
-        to="/ideas"
-        className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm"
-      >
-        <ArrowLeft size={16} /> Все идеи
-      </Link>
+    <div className="space-y-8 py-8 md:py-12">
+      <BackLink to="/ideas">Все идеи</BackLink>
 
-      <div>
-        <h1 className="font-display text-3xl md:text-4xl">🔥 18+</h1>
-        <p className="text-gray-400 mt-2 text-sm">
-          Уровни открываются постепенно. Выполняйте задания, чтобы открыть
-          следующий.
-        </p>
-      </div>
+      <PageTitle
+        title="18+"
+        subtitle="Уровни открываются постепенно. Выполняйте задания, чтобы открыть следующий."
+      />
 
       <div className="space-y-3">
         {LEVELS.map((lvl) => {
@@ -68,36 +57,48 @@ export default function AdultPage() {
           return (
             <button
               key={lvl.id}
+              type="button"
               disabled={!isUnlocked}
               onClick={() => isUnlocked && setSelectedLevel(lvl.id)}
-              className={`w-full text-left rounded-3xl border p-6 transition relative overflow-hidden ${
+              className={`w-full rounded-tile border p-5 text-left transition-colors ${
                 isUnlocked
-                  ? "bg-card border-border hover:border-amber/50 cursor-pointer"
-                  : "bg-card/50 border-border/50 cursor-not-allowed opacity-60"
+                  ? "cursor-pointer border-line bg-paper hover:border-ink/40"
+                  : "cursor-not-allowed border-dashed border-line"
               }`}
             >
               <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-2xl">{lvl.emoji}</span>
-                    <div className="font-display text-lg">
-                      Уровень {lvl.id} — {lvl.name}
+                <div className="flex flex-1 items-start gap-4">
+                  <span
+                    className={`text-3xl leading-none ${
+                      isUnlocked ? "" : "opacity-50"
+                    }`}
+                    aria-hidden="true"
+                  >
+                    {lvl.emoji}
+                  </span>
+                  <div>
+                    <div
+                      className={`font-display text-xl ${
+                        isUnlocked ? "" : "text-ink-soft"
+                      }`}
+                    >
+                      Уровень {lvl.id}: {lvl.name}
                     </div>
-                  </div>
-                  <p className="text-sm text-gray-400">{lvl.description}</p>
+                    <p className="text-sm text-ink-soft">{lvl.description}</p>
 
-                  {!isUnlocked && progress && (
-                    <div className="mt-3 text-xs text-gray-500">
-                      🔒 Выполни {progress.remaining} из {progress.need} на
-                      уровне {lvl.id - 1} ({progress.have}/{progress.need})
-                    </div>
-                  )}
+                    {!isUnlocked && progress && (
+                      <div className="mt-3 text-sm text-ink-soft">
+                        Выполни {progress.remaining} из {progress.need} на
+                        уровне {lvl.id - 1} ({progress.have}/{progress.need})
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div
-                  className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center border ${
+                  className={`grid h-10 w-10 shrink-0 place-items-center rounded-full ${
                     isUnlocked
-                      ? "bg-amber/10 border-amber text-amber"
-                      : "border-border text-gray-500"
+                      ? "bg-cherry text-white"
+                      : "border border-line text-ink-soft"
                   }`}
                 >
                   {isUnlocked ? <Check size={18} /> : <Lock size={16} />}

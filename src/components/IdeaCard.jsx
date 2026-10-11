@@ -5,6 +5,7 @@ import { timeLabel, budgetLabel } from "../utils/format";
 import { useAppStore } from "../store/useAppStore";
 import { getIdeaTimer } from "../utils/ideaTimers";
 import Timer from "./Timer";
+import ShareButton from "./ShareButton";
 
 export default function IdeaCard({ idea, onComplete }) {
   const cat = getCategory(idea.category);
@@ -29,7 +30,6 @@ export default function IdeaCard({ idea, onComplete }) {
       />
 
       <div className="relative">
-        {/* Бейджи: категория + уровень */}
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           <span
             className="text-xs font-semibold px-3 py-1 rounded-full"
@@ -47,13 +47,11 @@ export default function IdeaCard({ idea, onComplete }) {
           )}
         </div>
 
-        {/* Заголовок */}
         <h2 className="font-display text-2xl md:text-3xl mb-3">
           {idea.title}
         </h2>
         <p className="text-gray-400 mb-6 leading-relaxed">{idea.description}</p>
 
-        {/* Время и бюджет */}
         <div className="flex flex-wrap gap-3 mb-6 text-sm text-gray-400">
           <div className="flex items-center gap-1.5">
             <Clock size={16} />
@@ -65,7 +63,6 @@ export default function IdeaCard({ idea, onComplete }) {
           </div>
         </div>
 
-        {/* Шаги */}
         {idea.steps && idea.steps.length > 0 && (
           <div className="mb-6 space-y-2">
             {idea.steps.map((s, i) => (
@@ -79,14 +76,12 @@ export default function IdeaCard({ idea, onComplete }) {
           </div>
         )}
 
-        {/* Таймер — только там, где у идеи есть точное время */}
         {timerMinutes && (
           <div className="mb-6">
             <Timer minutes={timerMinutes} />
           </div>
         )}
 
-        {/* Кнопки */}
         <div className="flex gap-3">
           <button
             onClick={() => {
@@ -108,6 +103,7 @@ export default function IdeaCard({ idea, onComplete }) {
           >
             <Heart size={18} fill={isFav ? "currentColor" : "none"} />
           </button>
+          <ShareButton idea={idea} />
         </div>
       </div>
     </motion.div>

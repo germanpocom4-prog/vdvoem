@@ -1,53 +1,62 @@
-import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ideas } from "../data/ideas";
 import { categories } from "../data/categories";
-import IdeaCard from "../components/IdeaCard";
-import EmptyState from "../components/EmptyState";
 
 export default function AllIdeas() {
-  const [activeCat, setActiveCat] = useState("all");
-  const filtered =
-    activeCat === "all" ? ideas : ideas.filter((i) => i.category === activeCat);
+  const countByCat = (id) => ideas.filter((i) => i.category === id).length;
 
   return (
     <div className="py-8 space-y-6">
-      <h1 className="font-display text-3xl md:text-4xl">Все идеи</h1>
-
-      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2">
-        <button
-          onClick={() => setActiveCat("all")}
-          className={`px-4 py-2 rounded-full text-sm whitespace-nowrap shrink-0 transition ${
-            activeCat === "all"
-              ? "bg-amber text-bg font-semibold"
-              : "bg-card border border-border text-gray-400"
-          }`}
-        >
-          Все ({ideas.length})
-        </button>
-        {categories.filter((c) => c.id !== "movies").map((c) => (
-          <button
-            key={c.id}
-            onClick={() => setActiveCat(c.id)}
-            className={`px-4 py-2 rounded-full text-sm whitespace-nowrap shrink-0 transition ${
-              activeCat === c.id
-                ? "bg-amber text-bg font-semibold"
-                : "bg-card border border-border text-gray-400"
-            }`}
-          >
-            {c.emoji} {c.name}
-          </button>
-        ))}
+      <div>
+        <h1 className="font-display text-3xl md:text-4xl">Все идеи</h1>
+        <p className="text-gray-400 mt-2 text-sm">
+          Выбери категорию — откроется отдельная страница
+        </p>
       </div>
 
-      {filtered.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2">
-          {filtered.map((idea) => (
-            <IdeaCard key={idea.id} idea={idea} />
-          ))}
-        </div>
-      )}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Link
+          to="/ideas/all"
+          className="rounded-3xl bg-card border border-border p-6 hover:border-amber/50 transition group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="text-4xl">📚</div>
+            <div className="text-xs text-amber font-semibold">
+              {ideas.length} идей →
+            </div>
+          </div>
+          <div className="font-display text-xl mb-1">Все идеи</div>
+          <p className="text-gray-400 text-sm">
+            Полный список — от весёлых до 18+
+          </p>
+        </Link>
+
+        {categories.map((c) => {
+          const count = countByCat(c.id);
+          return (
+            <Link
+              key={c.id}
+              to={`/category/${c.id}`}
+              className="rounded-3xl bg-card border border-border p-6 hover:border-amber/50 transition group relative overflow-hidden"
+            >
+              <div
+                className="absolute -top-10 -right-10 w-32 h-32 rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition"
+                style={{ background: c.color }}
+              />
+              <div className="relative">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="text-4xl">{c.emoji}</div>
+                  <div className="text-xs text-amber font-semibold">
+                    {count} {count === 1 ? "идея" : count < 5 ? "идеи" : "идей"} →
+                  </div>
+                </div>
+                <div className="font-display text-xl mb-1">{c.name}</div>
+                <p className="text-gray-400 text-sm">{c.description}</p>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

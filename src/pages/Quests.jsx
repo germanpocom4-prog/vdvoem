@@ -2,21 +2,19 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { quests } from "../data/quests";
 import { ideas } from "../data/ideas";
+import { getCategory } from "../data/categories";
 import { Check } from "lucide-react";
 import { useAppStore } from "../store/useAppStore";
 import { plural } from "../utils/format";
 import PageTitle from "../components/PageTitle";
 import BackLink from "../components/BackLink";
+import Reveal from "../components/Reveal";
+import Stripe from "../components/Stripe";
 
-function EmojiBadge({ emoji }) {
-  return (
-    <div
-      className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-sun text-3xl"
-      aria-hidden="true"
-    >
-      {emoji}
-    </div>
-  );
+// Цвет полосы квеста берём по категории его первой идеи
+function questColor(quest) {
+  const first = ideas.find((x) => x.id === quest.steps[0]?.ideaId);
+  return getCategory(first?.category)?.color;
 }
 
 export default function Quests() {
@@ -29,71 +27,80 @@ export default function Quests() {
     const allDone = quest.steps.every((_, i) => doneSteps[i]);
 
     return (
-      <div className="space-y-8 py-8 md:py-12">
-        <BackLink
-          onClick={() => {
-            setActive(null);
-            setDoneSteps({});
-          }}
-        >
-          Назад
-        </BackLink>
+      <div className="space-y-12 py-16 md:space-y-16 md:py-24">
+        <div className="space-y-8">
+          <BackLink
+            onClick={() => {
+              setActive(null);
+              setDoneSteps({});
+            }}
+          >
+            Назад
+          </BackLink>
 
-        <PageTitle
-          badge={<EmojiBadge emoji={quest.emoji} />}
-          title={quest.title}
-          subtitle={quest.description}
-        />
+          <PageTitle
+            badge={
+              <span className="text-xl leading-none" aria-hidden="true">
+                {quest.emoji}
+              </span>
+            }
+            title={quest.title}
+            subtitle={quest.description}
+          />
+        </div>
 
-        <ol className="space-y-3">
+        <ol className="space-y-4">
           {quest.steps.map((step, i) => {
             const idea = ideas.find((x) => x.id === step.ideaId);
             const done = doneSteps[i];
             return (
-              <li
-                key={i}
-                className={`flex items-start gap-4 rounded-tile border bg-paper p-5 transition-colors ${
-                  done ? "border-ink" : "border-line"
-                }`}
-              >
-                <button
-                  type="button"
-                  aria-pressed={!!done}
-                  aria-label={`Шаг ${i + 1}: ${step.label}`}
-                  onClick={() => {
-                    setDoneSteps((prev) => ({ ...prev, [i]: !prev[i] }));
-                    if (!done && idea) completeIdea(idea.id);
-                  }}
-                  className={`grid h-11 w-11 shrink-0 place-items-center rounded-full border-2 font-display text-lg transition-colors ${
-                    done
-                      ? "border-ink bg-ink text-white"
-                      : "border-line text-ink-soft hover:border-ink hover:text-ink"
+              <Reveal key={i} i={i} className="">
+                <li
+                  className={`card flex items-start gap-5 p-6 ${
+                    done ? "!border-accent" : ""
                   }`}
                 >
-                  {done ? <Check size={20} /> : i + 1}
-                </button>
-                <div className="min-w-0 flex-1 pt-1">
-                  <div className="mb-1 font-semibold">{step.label}</div>
-                  {idea && (
-                    <p className="text-sm text-ink-soft">{idea.description}</p>
-                  )}
-                </div>
-              </li>
+                  <button
+                    type="button"
+                    aria-pressed={!!done}
+                    aria-label={`Шаг ${i + 1}: ${step.label}`}
+                    onClick={() => {
+                      setDoneSteps((prev) => ({ ...prev, [i]: !prev[i] }));
+                      if (!done && idea) completeIdea(idea.id);
+                    }}
+                    className={`grid h-11 w-11 shrink-0 place-items-center rounded-full border font-display text-lg transition-colors duration-300 ${
+                      done
+                        ? "border-accent bg-accent text-ivory"
+                        : "border-line text-muted hover:border-accent hover:text-accent"
+                    }`}
+                  >
+                    {done ? <Check size={18} /> : i + 1}
+                  </button>
+                  <div className="min-w-0 flex-1 pt-1.5">
+                    <div className="mb-1 font-medium">{step.label}</div>
+                    {idea && (
+                      <p className="text-[15px] text-muted">{idea.description}</p>
+                    )}
+                  </div>
+                </li>
+              </Reveal>
             );
           })}
         </ol>
 
         {allDone && (
           <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="rounded-card bg-sun p-6 text-center shadow-card"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="card border-accent p-8 text-center"
           >
-            <div className="mb-2 text-4xl" aria-hidden="true">
-              🎉
+            <div className="font-display text-[1.75rem] font-semibold">
+              Квест пройден!
             </div>
-            <div className="font-display text-2xl">Квест пройден!</div>
-            <p className="mt-1">Вы молодцы. Отдохните и обнимитесь.</p>
+            <p className="mt-2 text-muted">
+              Вы молодцы. Отдохните и обнимитесь.
+            </p>
           </motion.div>
         )}
       </div>
@@ -101,29 +108,36 @@ export default function Quests() {
   }
 
   return (
-    <div className="space-y-8 py-8 md:py-12">
+    <div className="space-y-12 py-16 md:space-y-16 md:py-24">
       <PageTitle
         title="Квесты на вечер"
         subtitle="Готовые сценарии из 3 шагов. Просто идите по порядку."
       />
 
-      <div className="grid gap-3 md:grid-cols-2">
-        {quests.map((q) => (
-          <button
-            key={q.id}
-            type="button"
-            onClick={() => setActive(q.id)}
-            className="flex items-start gap-4 rounded-tile border border-line bg-paper p-5 text-left transition-colors hover:border-ink/40"
-          >
-            <EmojiBadge emoji={q.emoji} />
-            <div>
-              <div className="font-display text-xl">{q.title}</div>
-              <p className="text-sm text-ink-soft">{q.description}</p>
-              <div className="mt-2 text-sm font-semibold">
-                {q.steps.length} {plural(q.steps.length, "шаг", "шага", "шагов")}
+      <div className="grid gap-5 md:grid-cols-2">
+        {quests.map((q, i) => (
+          <Reveal key={q.id} i={i}>
+            <button
+              type="button"
+              onClick={() => setActive(q.id)}
+              className="card card-hover relative block h-full w-full overflow-hidden p-7 pl-8 text-left md:p-8 md:pl-9"
+            >
+              <Stripe color={questColor(q)} />
+              <div className="mb-4 flex items-center justify-between text-sm text-muted">
+                <span className="text-xl leading-none" aria-hidden="true">
+                  {q.emoji}
+                </span>
+                <span>
+                  {q.steps.length}{" "}
+                  {plural(q.steps.length, "шаг", "шага", "шагов")}
+                </span>
               </div>
-            </div>
-          </button>
+              <div className="mb-1 font-display text-[1.5rem] font-semibold">
+                {q.title}
+              </div>
+              <p className="text-[15px] text-muted">{q.description}</p>
+            </button>
+          </Reveal>
         ))}
       </div>
     </div>

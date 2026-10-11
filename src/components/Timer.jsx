@@ -40,13 +40,13 @@ export default function Timer({ minutes = 30 }) {
   const isAlmostDone = secondsLeft <= 60 && secondsLeft > 0;
 
   return (
-    <div className="rounded-2xl bg-paper p-4 text-ink">
+    <div className="rounded-xl border border-line p-4">
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1">
-          <div className="mb-1 text-sm font-medium text-ink-soft">Таймер</div>
+          <div className="mb-1 text-sm text-muted">Таймер</div>
           <div
-            className={`font-display text-4xl leading-none tabular-nums ${
-              isAlmostDone ? "animate-pulse text-cherry" : "text-ink"
+            className={`font-display text-3xl font-semibold leading-none tabular-nums transition-colors duration-500 ${
+              isAlmostDone ? "text-wine" : "text-ink"
             }`}
           >
             {mm}:{ss}
@@ -59,39 +59,36 @@ export default function Timer({ minutes = 30 }) {
             onClick={toggle}
             disabled={isDone}
             aria-label={running ? "Пауза" : "Старт"}
-            className={`grid h-12 w-12 place-items-center rounded-full transition-colors ${
+            className={`grid h-11 w-11 place-items-center rounded-full border transition-colors duration-300 ${
               isDone
-                ? "cursor-not-allowed bg-line text-ink-soft"
+                ? "cursor-not-allowed border-line text-muted opacity-60"
                 : running
-                ? "bg-cherry text-white hover:bg-[#c42740]"
-                : "bg-ink text-white hover:bg-black"
+                ? "border-wine text-wine"
+                : "border-accent bg-accent text-ivory hover:bg-accent-strong"
             }`}
           >
-            {running ? <Pause size={20} /> : <Play size={20} />}
+            {running ? <Pause size={18} /> : <Play size={18} />}
           </button>
           <button
             type="button"
             onClick={reset}
             aria-label="Сбросить таймер"
-            className="grid h-12 w-12 place-items-center rounded-full border border-line text-ink-soft transition-colors hover:text-ink"
+            className="btn-quiet grid h-11 w-11 place-items-center !rounded-full"
           >
-            <RotateCcw size={18} />
+            <RotateCcw size={17} />
           </button>
         </div>
       </div>
 
-      <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-line">
+      <div className="mt-4 h-1 overflow-hidden rounded-full bg-line">
         <div
-          className="h-full bg-ink transition-all duration-1000"
+          className="h-full bg-accent transition-all duration-1000"
           style={{ width: `${progress}%` }}
         />
       </div>
 
       {isDone && (
-        <div
-          role="status"
-          className="mt-3 text-center text-sm font-semibold text-cherry"
-        >
+        <div role="status" className="mt-3 text-center text-sm font-medium text-accent">
           Время вышло!
         </div>
       )}

@@ -1,54 +1,62 @@
 import { Link } from "react-router-dom";
-import { Layers } from "lucide-react";
 import { ideas } from "../data/ideas";
 import { categories } from "../data/categories";
 import { plural } from "../utils/format";
 import PageTitle from "../components/PageTitle";
-import CategoryBadge from "../components/CategoryBadge";
+import Reveal from "../components/Reveal";
 
-const tile =
-  "flex items-start gap-4 rounded-tile border border-line bg-paper p-5 transition-colors hover:border-ink/40";
+const tile = "card card-hover block h-full p-7 md:p-8";
 
 export default function AllIdeas() {
   const countByCat = (id) => ideas.filter((i) => i.category === id).length;
   const ideaWord = (n) => plural(n, "идея", "идеи", "идей");
 
   return (
-    <div className="space-y-8 py-8 md:py-12">
+    <div className="space-y-12 py-16 md:space-y-16 md:py-24">
       <PageTitle
         title="Все идеи"
         subtitle="Выбери категорию — откроется отдельная страница"
       />
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <Link to="/ideas/all" className={tile}>
-          <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-ink text-white">
-            <Layers size={26} />
-          </div>
-          <div>
-            <div className="font-display text-xl">Все идеи</div>
-            <p className="text-sm text-ink-soft">
+      <div className="grid gap-5 md:grid-cols-2">
+        <Reveal i={0}>
+          <Link to="/ideas/all" className={tile}>
+            <div className="mb-4 flex items-center justify-between text-sm text-muted">
+              <span className="text-xl leading-none" aria-hidden="true">
+                📚
+              </span>
+              <span>
+                {ideas.length} {ideaWord(ideas.length)}
+              </span>
+            </div>
+            <div className="mb-1 font-display text-[1.5rem] font-semibold">
+              Все идеи
+            </div>
+            <p className="text-[15px] text-muted">
               Полный список — от весёлых до 18+
             </p>
-            <div className="mt-2 text-sm font-semibold">
-              {ideas.length} {ideaWord(ideas.length)}
-            </div>
-          </div>
-        </Link>
+          </Link>
+        </Reveal>
 
-        {categories.map((c) => {
+        {categories.map((c, idx) => {
           const count = countByCat(c.id);
           return (
-            <Link key={c.id} to={`/category/${c.id}`} className={tile}>
-              <CategoryBadge category={c} />
-              <div>
-                <div className="font-display text-xl">{c.name}</div>
-                <p className="text-sm text-ink-soft">{c.description}</p>
-                <div className="mt-2 text-sm font-semibold">
-                  {count} {ideaWord(count)}
+            <Reveal key={c.id} i={idx + 1}>
+              <Link to={`/category/${c.id}`} className={tile}>
+                <div className="mb-4 flex items-center justify-between text-sm text-muted">
+                  <span className="text-xl leading-none" aria-hidden="true">
+                    {c.emoji}
+                  </span>
+                  <span>
+                    {count} {ideaWord(count)}
+                  </span>
                 </div>
-              </div>
-            </Link>
+                <div className="mb-1 font-display text-[1.5rem] font-semibold">
+                  {c.name}
+                </div>
+                <p className="text-[15px] text-muted">{c.description}</p>
+              </Link>
+            </Reveal>
           );
         })}
       </div>

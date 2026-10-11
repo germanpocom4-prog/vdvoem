@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 import { Home, Grid3x3, Film, Trophy, BarChart3, Settings } from "lucide-react";
-import HeartMark from "./HeartMark";
 
 const links = [
   { to: "/", icon: Home, label: "Главная" },
@@ -13,11 +12,8 @@ const links = [
 
 function Logo() {
   return (
-    <NavLink to="/" className="inline-flex items-center gap-2.5">
-      <span className="grid h-8 w-8 place-items-center rounded-lg bg-cobalt text-white">
-        <HeartMark className="h-4 w-4" />
-      </span>
-      <span className="font-display text-xl">Вдвоём</span>
+    <NavLink to="/" className="font-display text-[22px] font-bold text-ink">
+      Вдвоём<span className="text-accent">.</span>
     </NavLink>
   );
 }
@@ -25,26 +21,26 @@ function Logo() {
 export default function Navbar() {
   return (
     <>
-      {/* Мобильная шапка: только логотип, уезжает вместе со страницей */}
-      <header className="px-4 pt-5 md:hidden">
+      {/* Мобильная шапка: только логотип */}
+      <header className="px-5 pt-6 md:hidden">
         <Logo />
       </header>
 
       {/* Desktop */}
-      <nav className="fixed left-0 right-0 top-0 z-40 hidden border-b border-line bg-table/85 backdrop-blur-md md:flex">
-        <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-6">
+      <nav className="fixed left-0 right-0 top-0 z-40 hidden border-b border-line bg-page/90 backdrop-blur-md md:flex">
+        <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-8">
           <Logo />
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-7">
             {links.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
                 end={l.to === "/"}
                 className={({ isActive }) =>
-                  `rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  `border-b pb-0.5 text-sm transition-colors duration-300 ${
                     isActive
-                      ? "bg-ink text-white"
-                      : "text-ink-soft hover:bg-ink/5 hover:text-ink"
+                      ? "border-accent text-accent"
+                      : "border-transparent text-muted hover:text-ink"
                   }`
                 }
               >
@@ -56,8 +52,8 @@ export default function Navbar() {
       </nav>
 
       {/* Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-paper/95 backdrop-blur-md md:hidden">
-        <div className="flex justify-around px-1 py-2">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-line bg-page/95 md:hidden">
+        <div className="flex justify-around px-1 py-2.5">
           {links.map((l) => {
             const Icon = l.icon;
             return (
@@ -66,23 +62,13 @@ export default function Navbar() {
                 to={l.to}
                 end={l.to === "/"}
                 className={({ isActive }) =>
-                  `flex flex-col items-center gap-1 px-1.5 text-[11px] font-medium ${
-                    isActive ? "text-ink" : "text-ink-soft"
+                  `flex flex-col items-center gap-1 px-2 py-1 text-[11px] transition-colors duration-300 ${
+                    isActive ? "text-accent" : "text-muted"
                   }`
                 }
               >
-                {({ isActive }) => (
-                  <>
-                    <span
-                      className={`grid h-7 w-12 place-items-center rounded-full transition-colors ${
-                        isActive ? "bg-ink text-white" : ""
-                      }`}
-                    >
-                      <Icon size={18} />
-                    </span>
-                    <span>{l.label}</span>
-                  </>
-                )}
+                <Icon size={18} />
+                <span>{l.label}</span>
               </NavLink>
             );
           })}

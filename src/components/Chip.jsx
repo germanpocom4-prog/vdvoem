@@ -4,10 +4,10 @@ export default function Chip({ active, onClick, children }) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+      className={`shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-sm transition-colors duration-300 ${
         active
-          ? "border-ink bg-ink text-white"
-          : "border-line bg-paper text-ink-soft hover:border-ink/40 hover:text-ink"
+          ? "border-accent bg-accent text-ivory"
+          : "border-line bg-transparent text-muted hover:border-accent"
       }`}
     >
       {children}

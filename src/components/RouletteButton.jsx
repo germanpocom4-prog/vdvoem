@@ -1,17 +1,17 @@
 import { motion } from "framer-motion";
-import { Shuffle } from "lucide-react";
 
 export default function RouletteButton({ onClick, loading, hasIdea }) {
   return (
     <motion.button
       type="button"
-      whileTap={{ scale: 0.97 }}
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
       onClick={onClick}
       disabled={loading}
-      className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-cherry px-6 py-4 text-lg font-semibold text-white shadow-lift transition-colors hover:bg-[#c42740] disabled:opacity-80"
+      className="rounded-xl bg-accent px-8 py-4 text-base font-semibold text-ivory shadow-cta transition-[background-color,box-shadow] duration-300 hover:bg-accent-strong hover:shadow-cta-hover disabled:opacity-80"
     >
-      <Shuffle size={20} />
-      {loading ? "Тасуем…" : hasIdea ? "Вытянуть другую" : "Вытянуть карту"}
+      {loading ? "Ищу…" : hasIdea ? "Вытянуть другую" : "Вытянуть карту"}
     </motion.button>
   );
 }

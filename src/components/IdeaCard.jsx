@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Clock, Wallet, Heart, Check } from "lucide-react";
 import { getCategory } from "../data/categories";
 import { timeLabel, budgetLabel } from "../utils/format";
@@ -5,8 +6,10 @@ import { useAppStore } from "../store/useAppStore";
 import { getIdeaTimer } from "../utils/ideaTimers";
 import Timer from "./Timer";
 import ShareButton from "./ShareButton";
+import Stripe from "./Stripe";
+import CategoryBadge from "./CategoryBadge";
 
-// Идея — это карта: заливка и цвет текста берутся из категории
+// Журнальная карточка: слоновая кость, тонкая рамка, цветная полоса категории
 export default function IdeaCard({ idea, onComplete }) {
   const cat = getCategory(idea.category);
   const favorites = useAppStore((s) => s.favorites);
@@ -18,95 +21,82 @@ export default function IdeaCard({ idea, onComplete }) {
   const isDone = history.some((h) => h.ideaId === idea.id);
   const timerMinutes = getIdeaTimer(idea);
 
-  const fill = cat?.color || "#FFFFFF";
-  const fg = cat?.fg || "#1E1633";
-
   return (
-    <article
-      className="flex flex-col rounded-card p-6 shadow-card md:p-7"
-      style={{ background: fill, color: fg }}
-    >
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <span className="inline-flex items-center gap-2 text-sm font-semibold">
-          <span className="text-xl leading-none" aria-hidden="true">
-            {cat?.emoji}
-          </span>
+    <article className="card card-hover relative flex h-full flex-col overflow-hidden p-7 pl-8 md:p-8 md:pl-9">
+      <Stripe color={cat?.color} />
+
+      <div className="mb-5 flex items-center justify-between gap-3 text-sm text-muted">
+        <span className="inline-flex items-center gap-2">
+          <CategoryBadge category={cat} />
           {cat?.name}
         </span>
         {idea.level && (
-          <span
-            className="rounded-full px-3 py-1 text-xs font-semibold"
-            style={{ background: fg, color: fill }}
-          >
+          <span className="rounded-full border border-line px-3 py-0.5 text-xs">
             Уровень {idea.level}
           </span>
         )}
       </div>
 
-      <h2 className="mb-3 font-display text-[1.75rem] leading-[1.1] md:text-3xl">
+      <h2 className="mb-3 font-display text-[1.75rem] font-semibold leading-[1.2]">
         {idea.title}
       </h2>
-      <p className="mb-5 leading-relaxed" style={{ opacity: 0.92 }}>
+      <p className="mb-6 text-[15px] text-muted md:text-base">
         {idea.description}
       </p>
 
-      <div className="mb-5 flex flex-wrap gap-2 text-sm font-medium">
-        <span
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1"
-          style={{ border: "1px solid currentColor" }}
-        >
-          <Clock size={14} />
+      <div className="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
+        <span className="inline-flex items-center gap-2">
+          <Clock size={15} />
           {timeLabel[idea.time]}
         </span>
-        <span
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1"
-          style={{ border: "1px solid currentColor" }}
-        >
-          <Wallet size={14} />
+        <span className="inline-flex items-center gap-2">
+          <Wallet size={15} />
           {budgetLabel[idea.budget]}
         </span>
       </div>
 
       {idea.steps && idea.steps.length > 0 && (
-        <ol className="mb-5 space-y-3 rounded-2xl bg-paper p-4 text-ink">
+        <ol className="mb-6 space-y-3 border-t border-line pt-6">
           {idea.steps.map((s, i) => (
-            <li key={i} className="flex gap-3 text-sm">
-              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white">
+            <li key={i} className="flex gap-4 text-[15px]">
+              <span className="w-5 shrink-0 font-display text-lg leading-[1.6] text-accent">
                 {i + 1}
               </span>
-              <span className="pt-0.5">{s}</span>
+              <span className="text-muted">{s}</span>
             </li>
           ))}
         </ol>
       )}
 
       {timerMinutes && (
-        <div className="mb-5">
+        <div className="mb-6">
           <Timer minutes={timerMinutes} />
         </div>
       )}
 
-      <div className="flex gap-3">
-        <button
+      <div className="mt-auto flex gap-3">
+        <motion.button
           type="button"
+          whileHover={{ scale: 1.01 }}
+          whileTap={{ scale: 0.98 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
           onClick={() => {
             completeIdea(idea.id);
             onComplete?.();
           }}
-          className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-ink py-3.5 font-semibold text-white transition-colors hover:bg-black"
+          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent py-3.5 font-semibold text-ivory shadow-cta transition-[background-color,box-shadow] duration-300 hover:bg-accent-strong hover:shadow-cta-hover"
         >
           <Check size={18} />
           {isDone ? "Сделано ещё раз" : "Мы сделали"}
-        </button>
+        </motion.button>
         <button
           type="button"
           onClick={() => toggleFavorite(idea.id)}
           aria-pressed={isFav}
           aria-label={isFav ? "Убрать из избранного" : "В избранное"}
-          className={`grid w-12 shrink-0 place-items-center rounded-2xl transition-colors ${
-            isFav ? "bg-paper text-cherry" : "hover:bg-white/20"
+          className={`btn-quiet grid w-12 shrink-0 place-items-center ${
+            isFav ? "!border-wine !text-wine" : ""
           }`}
-          style={isFav ? undefined : { border: "1.5px solid currentColor" }}
         >
           <Heart size={18} fill={isFav ? "currentColor" : "none"} />
         </button>

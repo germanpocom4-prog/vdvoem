@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { getIdeaOfDay, getTodayLabel } from "../utils/ideaOfDay";
 import { getCategory } from "../data/categories";
@@ -13,37 +14,43 @@ export default function IdeaOfDay() {
   const isDone = history.some((h) => h.ideaId === idea.id);
 
   return (
-    <section className="flex flex-col gap-4 rounded-tile border border-line bg-paper p-5 md:flex-row md:items-center md:gap-6 md:p-6">
-      <CategoryBadge category={cat} />
-
-      <div className="min-w-0 flex-1">
-        <div className="mb-1 text-sm font-medium text-ink-soft">
-          Идея дня, {getTodayLabel()}
-        </div>
-        <h2 className="font-display text-2xl leading-tight">{idea.title}</h2>
-        <p className="mt-1.5 text-ink-soft">{idea.description}</p>
-        <Link
-          to={`/category/${idea.category}`}
-          className="mt-3 inline-block text-sm font-medium underline decoration-ink/30 underline-offset-4 transition-colors hover:decoration-ink"
-        >
-          Раздел «{cat?.name}»
-        </Link>
+    <section className="card card-hover p-7 md:p-8">
+      <div className="mb-3 text-xs font-medium uppercase tracking-[0.1em] text-accent">
+        Идея дня · {getTodayLabel()}
       </div>
 
-      <div className="shrink-0">
+      <h2 className="font-display text-[1.75rem] font-semibold leading-[1.2]">
+        {idea.title}
+      </h2>
+      <p className="mt-3 text-[15px] text-muted md:text-base">
+        {idea.description}
+      </p>
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
+        <Link
+          to={`/category/${idea.category}`}
+          className="inline-flex items-center gap-2 text-sm text-muted transition-colors duration-300 hover:text-accent"
+        >
+          <CategoryBadge category={cat} />
+          {cat?.name}
+        </Link>
+
         {isDone ? (
-          <div className="inline-flex items-center gap-2 text-sm font-semibold">
-            <Check size={16} className="text-cobalt" />
+          <div className="inline-flex items-center gap-2 text-sm font-medium text-accent">
+            <Check size={16} />
             Уже сделали сегодня
           </div>
         ) : (
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             onClick={() => completeIdea(idea.id)}
-            className="w-full rounded-2xl bg-ink px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-black md:w-auto"
+            className="rounded-xl bg-accent px-6 py-2.5 text-sm font-semibold text-ivory shadow-cta transition-[background-color,box-shadow] duration-300 hover:bg-accent-strong hover:shadow-cta-hover"
           >
             Мы сделали
-          </button>
+          </motion.button>
         )}
       </div>
     </section>

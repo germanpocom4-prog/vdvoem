@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Flame } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import RouletteButton from "../components/RouletteButton";
-import Deck from "../components/Deck";
+import IdeaCard from "../components/IdeaCard";
 import FilterBar from "../components/FilterBar";
 import IdeaOfDay from "../components/IdeaOfDay";
+import Reveal from "../components/Reveal";
 import { pickRandom } from "../utils/random";
 import { plural } from "../utils/format";
 import { useFiltersStore } from "../store/useFiltersStore";
@@ -12,72 +13,75 @@ import { useAppStore } from "../store/useAppStore";
 export default function Home() {
   const [idea, setIdea] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [nothingFound, setNothingFound] = useState(false);
   const filters = useFiltersStore();
   const streak = useAppStore((s) => s.streak);
 
   const spin = () => {
-    if (loading) return;
     setLoading(true);
-    setNothingFound(false);
     setTimeout(() => {
       const next = pickRandom(filters, idea?.id);
-      if (next) {
-        setIdea(next);
-      } else {
-        setNothingFound(true);
-      }
+      setIdea(next);
       setLoading(false);
-    }, 650);
+    }, 400);
   };
 
   return (
-    <div className="space-y-10 py-8 md:space-y-14 md:py-14">
-      <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_24rem] md:grid-rows-[auto_1fr] md:gap-x-14 md:gap-y-8">
-        {/* Заголовок */}
-        <div className="space-y-4 md:col-start-1 md:row-start-1 md:pt-4">
-          <h1 className="font-display text-[2.5rem] leading-[1.02] md:text-[3.5rem]">
+    <div className="space-y-16 py-16 md:space-y-24 md:py-24">
+      {/* Заголовок */}
+      <Reveal i={0} className="">
+        <header className="mx-auto max-w-2xl text-center">
+          <h1 className="font-display text-[2.25rem] font-semibold leading-[1.12] md:text-[4rem]">
             Чем заняться вдвоём?
           </h1>
-          <p className="max-w-md text-base text-ink-soft md:text-lg">
+          <p className="mt-6 text-base text-muted">
             Жми — и получишь одну идею. Не список. Одну.
           </p>
           {streak > 0 && (
-            <div className="inline-flex items-center gap-2 rounded-full border border-line bg-paper px-4 py-1.5 text-sm font-semibold">
-              <Flame size={16} className="text-cherry" />
+            <p className="mt-5 text-sm font-medium text-accent">
               Стрик: {streak} {plural(streak, "день", "дня", "дней")}
-            </div>
-          )}
-        </div>
-
-        {/* Колода и кнопка */}
-        <div className="mx-auto w-full max-w-sm space-y-4 md:col-start-2 md:row-span-2 md:row-start-1 md:mx-0">
-          <Deck
-            idea={idea}
-            loading={loading}
-            onDraw={spin}
-            onComplete={() => setIdea(null)}
-          />
-          <RouletteButton onClick={spin} loading={loading} hasIdea={!!idea} />
-          {nothingFound && (
-            <p role="status" className="text-center text-sm text-ink-soft">
-              Под такие настройки идей нет. Попробуй выбрать «любое».
             </p>
           )}
-        </div>
+        </header>
+      </Reveal>
 
-        {/* Фильтры */}
-        <div className="md:col-start-1 md:row-start-2">
-          <div className="rounded-tile border border-line bg-paper p-5 md:p-6">
-            <div className="mb-4 font-display text-xl">
-              Хочешь конкретнее? Настрой:
-            </div>
-            <FilterBar />
-          </div>
+      {/* Идея дня — сразу после заголовка */}
+      <Reveal i={1} className="">
+        <div className="mx-auto max-w-2xl">
+          <IdeaOfDay />
         </div>
-      </div>
+      </Reveal>
 
-      <IdeaOfDay />
+      {/* Рулетка и результат */}
+      <Reveal i={2} className="">
+        <section className="mx-auto max-w-2xl text-center">
+          <RouletteButton onClick={spin} loading={loading} hasIdea={!!idea} />
+
+          <AnimatePresence mode="wait">
+            {idea && (
+              <motion.div
+                key={idea.id}
+                className="mt-10 text-left"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <IdeaCard idea={idea} onComplete={() => setIdea(null)} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
+      </Reveal>
+
+      {/* Фильтры — просто на фоне, без контейнера */}
+      <Reveal i={3} className="">
+        <section className="mx-auto max-w-2xl">
+          <h2 className="mb-8 text-center font-display text-[1.5rem] font-semibold">
+            Хочешь конкретнее? Настрой:
+          </h2>
+          <FilterBar />
+        </section>
+      </Reveal>
     </div>
   );
 }

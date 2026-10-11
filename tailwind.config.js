@@ -1,32 +1,30 @@
 /** @type {import('tailwindcss').Config} */
+// Цвета завязаны на CSS-переменные (см. src/index.css),
+// чтобы раздел 18+ мог переключиться на тёмную тему без правок компонентов.
 export default {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
   theme: {
     extend: {
       colors: {
-        // Стол и бумага
-        table: "#F1EDF7",
-        paper: "#FFFFFF",
-        line: "#DDD6EC",
-        // Чернила
-        ink: "#1E1633",
-        "ink-soft": "#5E5675",
-        // Акценты
-        cherry: "#D92D47",
-        cobalt: "#3340E0",
-        sun: "#FFC93C",
+        page: "rgb(var(--bg) / <alpha-value>)",
+        surface: "rgb(var(--surface) / <alpha-value>)",
+        line: "rgb(var(--line) / <alpha-value>)",
+        ink: "rgb(var(--ink) / <alpha-value>)",
+        muted: "rgb(var(--muted) / <alpha-value>)",
+        accent: "rgb(var(--accent) / <alpha-value>)",
+        "accent-strong": "rgb(var(--accent-strong) / <alpha-value>)",
+        wine: "rgb(var(--wine) / <alpha-value>)",
+        ivory: "#FBF8F3",
       },
       fontFamily: {
-        sans: ['"Golos Text"', "system-ui", "sans-serif"],
-        display: ['"Yeseva One"', "Georgia", "serif"],
-      },
-      borderRadius: {
-        card: "28px",
-        tile: "20px",
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ['"Playfair Display"', "Georgia", "serif"],
       },
       boxShadow: {
-        card: "0 1px 0 rgba(30,22,51,.08), 0 14px 30px -14px rgba(30,22,51,.38)",
-        lift: "0 1px 0 rgba(30,22,51,.06), 0 8px 18px -10px rgba(30,22,51,.28)",
+        soft: "0 2px 12px rgba(42,37,32,0.04)",
+        lift: "0 8px 24px rgba(42,37,32,0.08)",
+        cta: "0 4px 16px rgba(198,138,62,0.25)",
+        "cta-hover": "0 6px 20px rgba(198,138,62,0.38)",
       },
     },
   },

@@ -12,11 +12,11 @@ export default function FilterBar() {
   const filters = useFiltersStore();
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-7">
       {FILTERS.map((f) => (
         <div key={f.key}>
-          <div className="mb-2 text-sm font-semibold">{f.title}</div>
-          <div className="no-scrollbar flex gap-2 overflow-x-auto pb-1 md:flex-wrap md:overflow-visible">
+          <div className="mb-3 text-center text-sm text-muted">{f.title}</div>
+          <div className="flex flex-wrap justify-center gap-2">
             {f.options.map((opt) => (
               <Chip
                 key={opt}

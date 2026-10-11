@@ -6,6 +6,7 @@ import { plural } from "../utils/format";
 import EmptyState from "../components/EmptyState";
 import PageTitle from "../components/PageTitle";
 import CategoryBadge from "../components/CategoryBadge";
+import Reveal from "../components/Reveal";
 import { Flame, Heart, Calendar } from "lucide-react";
 
 export default function Progress() {
@@ -15,53 +16,63 @@ export default function Progress() {
   const recent = history.slice(0, 20);
 
   return (
-    <div className="space-y-10 py-8 md:py-12">
+    <div className="space-y-16 py-16 md:space-y-20 md:py-24">
       <PageTitle title="Наш прогресс" subtitle="Всё, что вы сделали вместе" />
 
-      {/* Статистика: стрик главный, поэтому он залит цветом */}
-      <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-tile bg-cherry p-4 text-white md:p-5">
-          <Flame size={20} className="mb-3" />
-          <div className="font-display text-4xl leading-none">{streak}</div>
-          <div className="mt-2 text-xs md:text-sm">
-            {plural(streak, "день подряд", "дня подряд", "дней подряд")}
+      {/* Статистика */}
+      <div className="grid grid-cols-3 gap-3 md:gap-5">
+        <Reveal i={0}>
+          <div className="card h-full p-5 md:p-7">
+            <Flame size={18} className="mb-4 text-accent" />
+            <div className="font-display text-4xl font-semibold leading-none">
+              {streak}
+            </div>
+            <div className="mt-3 text-xs text-muted md:text-sm">
+              {plural(streak, "день подряд", "дня подряд", "дней подряд")}
+            </div>
           </div>
-        </div>
+        </Reveal>
 
-        <div className="rounded-tile border border-line bg-paper p-4 md:p-5">
-          <Calendar size={20} className="mb-3 text-cobalt" />
-          <div className="font-display text-4xl leading-none">
-            {history.length}
+        <Reveal i={1}>
+          <div className="card h-full p-5 md:p-7">
+            <Calendar size={18} className="mb-4 text-accent" />
+            <div className="font-display text-4xl font-semibold leading-none">
+              {history.length}
+            </div>
+            <div className="mt-3 text-xs text-muted md:text-sm">
+              всего сделано
+            </div>
           </div>
-          <div className="mt-2 text-xs text-ink-soft md:text-sm">
-            всего сделано
-          </div>
-        </div>
+        </Reveal>
 
-        <Link
-          to="/favorites"
-          className="rounded-tile border border-line bg-paper p-4 transition-colors hover:border-ink/40 md:p-5"
-        >
-          <Heart size={20} className="mb-3 text-cherry" />
-          <div className="font-display text-4xl leading-none">
-            {favorites.length}
-          </div>
-          <div className="mt-2 text-xs text-ink-soft md:text-sm">
-            в избранном
-          </div>
-        </Link>
+        <Reveal i={2}>
+          <Link
+            to="/favorites"
+            className="card card-hover block h-full p-5 md:p-7"
+          >
+            <Heart size={18} className="mb-4 text-wine" />
+            <div className="font-display text-4xl font-semibold leading-none">
+              {favorites.length}
+            </div>
+            <div className="mt-3 text-xs text-muted md:text-sm">
+              в избранном
+            </div>
+          </Link>
+        </Reveal>
       </div>
 
       {/* Последние дела */}
       <section>
-        <h2 className="mb-4 font-display text-2xl">Последние дела</h2>
+        <h2 className="mb-6 font-display text-[1.75rem] font-semibold">
+          Последние дела
+        </h2>
         {recent.length === 0 ? (
           <EmptyState
             title="Пока ничего"
             subtitle="Сделайте что-нибудь из идей!"
           />
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {recent.map((h, i) => {
               const idea = ideas.find((x) => x.id === h.ideaId);
               if (!idea) return null;
@@ -76,18 +87,17 @@ export default function Progress() {
                 minute: "2-digit",
               });
               return (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 rounded-tile border border-line bg-paper p-3 pr-4"
-                >
-                  <CategoryBadge category={cat} size="sm" />
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate font-medium">{idea.title}</div>
-                    <div className="mt-0.5 text-sm text-ink-soft">
-                      {day}, {time}
+                <Reveal key={i} i={i} className="">
+                  <div className="card flex items-center gap-4 px-5 py-4">
+                    <CategoryBadge category={cat} />
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-medium">{idea.title}</div>
+                      <div className="text-sm text-muted">
+                        {day}, {time}
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Reveal>
               );
             })}
           </div>
@@ -97,26 +107,27 @@ export default function Progress() {
       {/* Избранное (предпросмотр) */}
       {favoriteIdeas.length > 0 && (
         <section>
-          <div className="mb-4 flex items-center justify-between gap-4">
-            <h2 className="font-display text-2xl">Избранное</h2>
+          <div className="mb-6 flex items-center justify-between gap-4">
+            <h2 className="font-display text-[1.75rem] font-semibold">
+              Избранное
+            </h2>
             <Link
               to="/favorites"
-              className="text-sm font-medium underline decoration-ink/30 underline-offset-4 transition-colors hover:decoration-ink"
+              className="text-sm text-accent underline-offset-4 transition-colors duration-300 hover:underline"
             >
               Всё избранное
             </Link>
           </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            {favoriteIdeas.slice(0, 4).map((idea) => (
-              <div
-                key={idea.id}
-                className="rounded-tile border border-line bg-paper p-4"
-              >
-                <div className="mb-1 font-medium">{idea.title}</div>
-                <p className="line-clamp-2 text-sm text-ink-soft">
-                  {idea.description}
-                </p>
-              </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            {favoriteIdeas.slice(0, 4).map((idea, i) => (
+              <Reveal key={idea.id} i={i}>
+                <div className="card h-full p-6">
+                  <div className="mb-1 font-medium">{idea.title}</div>
+                  <p className="line-clamp-2 text-sm text-muted">
+                    {idea.description}
+                  </p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -124,7 +135,7 @@ export default function Progress() {
 
       {/* Опасная зона */}
       {history.length > 0 && (
-        <div className="border-t border-line pt-6">
+        <div className="border-t border-line pt-8">
           <button
             type="button"
             onClick={() => {
@@ -136,7 +147,7 @@ export default function Progress() {
                 resetAll();
               }
             }}
-            className="text-sm text-ink-soft underline underline-offset-4 transition-colors hover:text-cherry"
+            className="text-sm text-muted underline underline-offset-4 transition-colors duration-300 hover:text-wine"
           >
             Сбросить весь прогресс
           </button>

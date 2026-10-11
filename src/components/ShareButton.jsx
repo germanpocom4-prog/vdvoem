@@ -3,9 +3,6 @@ import html2canvas from "html2canvas";
 import { Share2, Loader2 } from "lucide-react";
 import { getCategory } from "../data/categories";
 
-const HEART_PATH =
-  "M12 21s-7.5-4.6-9.6-9.2C.9 8.3 3 4.5 6.6 4.5c2 0 3.8 1.1 5.4 3 1.6-1.9 3.4-3 5.4-3 3.6 0 5.7 3.8 4.2 7.3C19.5 16.4 12 21 12 21z";
-
 export default function ShareButton({ idea }) {
   const [loading, setLoading] = useState(false);
 
@@ -13,48 +10,46 @@ export default function ShareButton({ idea }) {
     setLoading(true);
 
     const cat = getCategory(idea.category);
-    const fill = cat?.color || "#FFFFFF";
-    const fg = cat?.fg || "#1E1633";
+    const stripe = cat?.color || "#E8DFD0";
 
-    // Временная карточка 1080x1080 в стиле «карты» из колоды
+    // Временная карточка 1080x1080 в стиле «бутик-отеля»
     const container = document.createElement("div");
     container.style.position = "fixed";
     container.style.left = "-9999px";
     container.style.top = "0";
     container.style.width = "1080px";
     container.style.height = "1080px";
-    container.style.background = fill;
-    container.style.color = fg;
-    container.style.padding = "80px";
+    container.style.background = "#F5F0E8";
+    container.style.color = "#2A2520";
+    container.style.padding = "96px 96px 96px 120px";
     container.style.boxSizing = "border-box";
     container.style.display = "flex";
     container.style.flexDirection = "column";
     container.style.justifyContent = "space-between";
-    container.style.fontFamily = '"Golos Text", system-ui, sans-serif';
+    container.style.fontFamily = 'Inter, system-ui, sans-serif';
 
     container.innerHTML = `
+      <div style="position:absolute;left:0;top:0;bottom:0;width:16px;background:${stripe};"></div>
+
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:20px;">
-          <div style="width:64px;height:64px;border-radius:16px;background:#3340E0;display:flex;align-items:center;justify-content:center;">
-            <svg viewBox="0 0 24 24" width="34" height="34" fill="#fff"><path d="${HEART_PATH}"/></svg>
-          </div>
-          <div style="font-family:'Yeseva One',Georgia,serif;font-size:48px;">Вдвоём</div>
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:46px;font-weight:700;">
+          Вдвоём<span style="color:#C68A3E;">.</span>
         </div>
-        <div style="font-size:30px;font-weight:600;">
+        <div style="font-size:28px;color:#6B625A;">
           ${cat?.emoji || ""} ${cat?.name || "Идея для пары"}
         </div>
       </div>
 
       <div>
-        <div style="font-family:'Yeseva One',Georgia,serif;font-size:100px;line-height:1.05;margin-bottom:44px;">
+        <div style="font-family:'Playfair Display',Georgia,serif;font-size:92px;font-weight:600;line-height:1.12;margin-bottom:44px;">
           ${idea.title}
         </div>
-        <div style="font-size:40px;line-height:1.4;max-width:900px;opacity:.92;">
+        <div style="font-size:38px;line-height:1.6;color:#6B625A;max-width:860px;">
           ${idea.description}
         </div>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:space-between;border-top:2px solid ${fg};padding-top:40px;font-size:28px;font-weight:500;">
+      <div style="display:flex;align-items:center;justify-content:space-between;border-top:2px solid #E8DFD0;padding-top:40px;font-size:26px;color:#6B625A;">
         <div>vdvoem-black.vercel.app</div>
         <div>${new Date().toLocaleDateString("ru-RU")}</div>
       </div>
@@ -113,8 +108,7 @@ export default function ShareButton({ idea }) {
       disabled={loading}
       aria-label="Поделиться картинкой"
       title="Поделиться картинкой"
-      className="grid w-12 shrink-0 place-items-center rounded-2xl transition-colors hover:bg-white/20"
-      style={{ border: "1.5px solid currentColor" }}
+      className="btn-quiet grid w-12 shrink-0 place-items-center"
     >
       {loading ? (
         <Loader2 size={18} className="animate-spin" />

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 const cls =
-  "inline-flex items-center gap-2 text-sm font-medium text-ink-soft transition-colors hover:text-ink";
+  "inline-flex items-center gap-2 text-sm text-muted transition-colors duration-300 hover:text-accent";
 
 export default function BackLink({ to, onClick, children }) {
   if (to) {
